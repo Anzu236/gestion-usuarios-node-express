@@ -1,0 +1,25 @@
+{
+  "name": "gestion-usuarios-node-express",
+  "version": "1.0.0",
+  "description": "Aplicación web backend para gestión de usuarios con Node.js y Express",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "backend",
+    "api"
+  ],
+  "author": "Angélica Peña Sarniguet",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
