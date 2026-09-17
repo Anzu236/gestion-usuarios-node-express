@@ -1,24 +1,25 @@
-# Gestión de Usuarios - Node.js & Express
+# Gestión de Usuarios - Node.js, Express, Sequelize & PostgreSQL
 
 Proyecto backend desarrollado con Node.js y Express como parte de la evaluación de los módulos 6, 7 y 8.
 
-En esta primera etapa se implementa la estructura inicial de una aplicación web utilizando Node.js, Express, variables de entorno, rutas modulares, controladores, middlewares, contenido estático y persistencia básica mediante archivos planos.
+Actualmente el proyecto incorpora una arquitectura modular, persistencia con PostgreSQL mediante Sequelize ORM, operaciones CRUD, búsquedas dinámicas, validaciones y relaciones entre entidades.
 
 ---
 
-## Objetivo del proyecto
+## Estado actual del proyecto
 
-Desarrollar la base de una aplicación backend organizada y escalable que permita posteriormente incorporar:
+Se encuentran implementadas:
 
-- Gestión de usuarios.
-- Base de datos PostgreSQL.
-- Operaciones CRUD.
-- ORM.
-- Autenticación mediante JWT.
-- API RESTful.
+- Parte 1 - Módulo 6: Node.js y Express.
+- Parte 2 - Módulo 7: PostgreSQL, Sequelize ORM, CRUD y relaciones.
+
+La Parte 3 - Módulo 8 incorporará posteriormente:
+
+- API RESTful ampliada.
+- Autenticación JWT.
+- Rutas protegidas.
 - Subida de archivos.
-
-Actualmente el proyecto corresponde a la **Parte 1 - Módulo 6**, enfocada en la configuración inicial del servidor y la estructura modular de la aplicación.
+- Validaciones de archivos.
 
 ---
 
@@ -27,228 +28,44 @@ Actualmente el proyecto corresponde a la **Parte 1 - Módulo 6**, enfocada en la
 - Node.js 18.19.1
 - npm 9.2.0
 - Express 5.2.1
+- PostgreSQL 16
+- Sequelize ORM
+- pg
+- pg-hstore
 - dotenv 17.4.2
 - nodemon 3.1.14
 - HTML5
 - CSS3
-- File System (`fs`) de Node.js
+- Git
+- GitHub
 
 ---
 
-## Requisitos del sistema
+## Arquitectura
 
-Para ejecutar el proyecto se necesita:
-
-- Node.js versión 18 o superior.
-- npm.
-- Navegador web.
-- Terminal.
-- Editor de código, recomendado Visual Studio Code.
-
-Para comprobar las versiones instaladas:
-
-```bash
-node --version
-npm --version
-```
-
----
-
-## Repositorio
-
-El código fuente del proyecto se encuentra disponible en GitHub:
-
-https://github.com/Anzu236/gestion-usuarios-node-express
-
----
-
-## Instalación
-
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/Anzu236/gestion-usuarios-node-express.git
-```
-
-### 2. Ingresar al proyecto
-
-```bash
-cd gestion-usuarios-node-express
-```
-
-### 3. Instalar dependencias
-
-```bash
-npm install
-```
-
-Este comando instalará automáticamente las dependencias declaradas en `package.json`.
-
----
-
-## Variables de entorno
-
-El proyecto utiliza `dotenv` para administrar variables de entorno.
-
-Crear el archivo `.env` tomando como referencia `.env.example`:
-
-```bash
-cp .env.example .env
-```
-
-Actualmente debe contener:
-
-```env
-PORT=3000
-```
-
-El archivo `.env` no se incluye en GitHub, ya que en futuras etapas podrá contener información sensible como credenciales de base de datos y secretos de autenticación.
-
----
-
-## Ejecución
-
-### Modo normal
-
-```bash
-npm start
-```
-
-Este comando ejecuta:
-
-```bash
-node app.js
-```
-
-### Modo desarrollo
-
-```bash
-npm run dev
-```
-
-Este comando utiliza Nodemon:
-
-```bash
-nodemon app.js
-```
-
-Nodemon reinicia automáticamente el servidor cada vez que detecta cambios en el código.
-
----
-
-## Acceso a la aplicación
-
-Una vez iniciado el servidor:
+El proyecto utiliza una estructura modular basada en separación de responsabilidades.
 
 ```text
-http://localhost:3000
+Cliente
+   |
+   v
+Express
+   |
+   v
+Routes
+   |
+   v
+Controllers
+   |
+   v
+Models
+   |
+   v
+Sequelize ORM
+   |
+   v
+PostgreSQL
 ```
-
----
-
-## Rutas disponibles
-
-### GET /
-
-Ruta principal de la aplicación.
-
-Devuelve una página HTML con información básica del proyecto.
-
-```text
-http://localhost:3000/
-```
-
-### GET /status
-
-Devuelve información sobre el estado del servidor en formato JSON.
-
-```text
-http://localhost:3000/status
-```
-
-Ejemplo de respuesta:
-
-```json
-{
-  "status": "success",
-  "message": "Servidor funcionando correctamente",
-  "data": {
-    "application": "Gestión de Usuarios",
-    "environment": "development",
-    "uptimeSeconds": 20,
-    "timestamp": "2026-09-08T20:00:00.000Z"
-  }
-}
-```
-
-El valor de `uptimeSeconds` cambia dependiendo del tiempo que lleve ejecutándose el servidor.
-
----
-
-## Archivos estáticos
-
-Express utiliza el middleware:
-
-```javascript
-express.static()
-```
-
-para servir archivos contenidos en:
-
-```text
-public/
-```
-
-Actualmente la carpeta contiene:
-
-```text
-styles.css
-```
-
-Este archivo proporciona los estilos de la página principal.
-
----
-
-## Registro de accesos
-
-La aplicación implementa persistencia básica mediante archivos planos.
-
-El middleware:
-
-```text
-middlewares/accessLogger.js
-```
-
-registra las visitas realizadas a las rutas principales.
-
-Los registros se almacenan en:
-
-```text
-logs/log.txt
-```
-
-Cada registro incluye:
-
-- Fecha.
-- Hora.
-- Método HTTP.
-- Ruta visitada.
-
-Ejemplo:
-
-```text
-08-09-2026 | 5:39:58 p. m. | GET /
-08-09-2026 | 5:40:01 p. m. | GET /status
-08-09-2026 | 5:40:05 p. m. | GET /status
-```
-
-Para agregar nuevos registros se utiliza:
-
-```javascript
-fs.appendFile()
-```
-
-Esto permite agregar contenido al final del archivo sin eliminar los registros existentes.
 
 ---
 
@@ -257,8 +74,15 @@ Esto permite agregar contenido al final del archivo sin eliminar los registros e
 ```text
 gestion-usuarios-node-express/
 │
+├── config/
+│   └── database.js
+│
 ├── controllers/
-│   └── indexController.js
+│   ├── indexController.js
+│   ├── userController.js
+│   ├── taskController.js
+│   ├── profileController.js
+│   └── roleController.js
 │
 ├── logs/
 │   └── log.txt
@@ -266,11 +90,23 @@ gestion-usuarios-node-express/
 ├── middlewares/
 │   └── accessLogger.js
 │
+├── models/
+│   ├── User.js
+│   ├── Task.js
+│   ├── Profile.js
+│   ├── Role.js
+│   ├── UserRole.js
+│   └── index.js
+│
 ├── public/
 │   └── styles.css
 │
 ├── routes/
-│   └── indexRoutes.js
+│   ├── indexRoutes.js
+│   ├── userRoutes.js
+│   ├── taskRoutes.js
+│   ├── profileRoutes.js
+│   └── roleRoutes.js
 │
 ├── services/
 │   └── .gitkeep
@@ -283,181 +119,727 @@ gestion-usuarios-node-express/
 └── README.md
 ```
 
-> El archivo `.env` existe localmente, pero no se incluye en GitHub debido a la configuración de `.gitignore`.
+---
+
+# Requisitos
+
+Para ejecutar el proyecto se necesita:
+
+- Node.js versión 18 o superior.
+- npm.
+- PostgreSQL.
+- Git.
+- Navegador web.
+- Terminal.
+- Visual Studio Code o editor equivalente.
+
+Comprobar Node.js:
+
+```bash
+node --version
+```
+
+Comprobar npm:
+
+```bash
+npm --version
+```
+
+Comprobar PostgreSQL:
+
+```bash
+psql --version
+```
 
 ---
 
-## Descripción de las carpetas
+# Instalación
 
-### controllers
+## 1. Clonar el repositorio
 
-Contiene la lógica encargada de procesar las solicitudes y generar las respuestas.
+```bash
+git clone https://github.com/Anzu236/gestion-usuarios-node-express.git
+```
 
-Actualmente `indexController.js` contiene los controladores correspondientes a `/` y `/status`.
+## 2. Ingresar al proyecto
 
-### routes
+```bash
+cd gestion-usuarios-node-express
+```
 
-Contiene la definición de las rutas de la aplicación.
+## 3. Instalar dependencias
 
-Permite separar las direcciones HTTP de la lógica de los controladores.
-
-### middlewares
-
-Contiene funciones que se ejecutan durante el ciclo de una solicitud HTTP.
-
-Actualmente `accessLogger.js` se utiliza para registrar los accesos.
-
-### public
-
-Contiene los archivos estáticos que pueden ser solicitados directamente por el navegador.
-
-### logs
-
-Contiene los registros generados por la aplicación.
-
-### services
-
-Carpeta preparada para incorporar lógica de servicios durante las siguientes etapas del proyecto.
+```bash
+npm install
+```
 
 ---
 
-## Arquitectura utilizada
+# Configuración de PostgreSQL
 
-La aplicación utiliza una estructura modular basada en separación de responsabilidades.
+El proyecto utiliza la base de datos:
 
 ```text
-Cliente
-   |
-   v
-Express
-   |
-   v
-Routes
-   |
-   v
-Middlewares
-   |
-   v
-Controllers
-   |
-   v
-Respuesta
+gestion_usuarios_db
 ```
 
-Esta organización facilita el mantenimiento y permite incorporar nuevas funcionalidades sin concentrar toda la lógica en un solo archivo.
+y el usuario:
 
----
-
-## Justificación del uso de app.js
-
-Se eligió `app.js` como archivo principal porque representa claramente el punto de entrada de la aplicación Express.
-
-Sus principales responsabilidades son:
-
-- Cargar variables de entorno.
-- Configurar Express.
-- Configurar middlewares generales.
-- Servir archivos estáticos.
-- Conectar las rutas.
-- Iniciar el servidor.
-
-La lógica específica se mantiene separada en controladores, rutas y middlewares.
-
----
-
-## Justificación de la estructura modular
-
-Se decidió separar el proyecto en:
-
-- `routes`
-- `controllers`
-- `middlewares`
-- `public`
-- `logs`
-- `services`
-
-Esta estructura mantiene las responsabilidades organizadas y facilita la futura integración de PostgreSQL, ORM, autenticación y API RESTful.
-
----
-
-## Justificación de los scripts
-
-El proyecto utiliza:
-
-```json
-"scripts": {
-  "start": "node app.js",
-  "dev": "nodemon app.js"
-}
+```text
+gestion_app
 ```
 
-### npm start
+Ejemplo de creación:
 
-Ejecuta normalmente la aplicación utilizando Node.js.
+```sql
+CREATE ROLE gestion_app WITH LOGIN;
+```
 
-### npm run dev
+Configurar contraseña desde PostgreSQL:
 
-Ejecuta la aplicación utilizando Nodemon, lo que permite reiniciar automáticamente el servidor al modificar el código.
+```text
+\password gestion_app
+```
+
+Crear la base:
+
+```sql
+CREATE DATABASE gestion_usuarios_db OWNER gestion_app;
+```
 
 ---
 
-## Manejo de rutas inexistentes
+# Variables de entorno
 
-Si el usuario intenta acceder a una ruta que no existe, la aplicación devuelve un error HTTP `404`.
+Crear `.env` tomando como referencia:
+
+```text
+.env.example
+```
+
+Ejemplo:
+
+```env
+PORT=3000
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=gestion_usuarios_db
+DB_USER=gestion_app
+DB_PASSWORD=TU_CONTRASEÑA
+```
+
+El archivo `.env` se encuentra excluido mediante `.gitignore` y no debe publicarse en GitHub.
+
+---
+
+# Ejecución
+
+## Modo normal
+
+```bash
+npm start
+```
+
+## Modo desarrollo
+
+```bash
+npm run dev
+```
+
+Si PostgreSQL se encuentra correctamente configurado aparecerá:
+
+```text
+Conexión a PostgreSQL establecida correctamente.
+Modelos sincronizados con PostgreSQL.
+Servidor iniciado en http://localhost:3000
+```
+
+---
+
+# Rutas generales
+
+## GET /
+
+Página principal HTML.
+
+```text
+http://localhost:3000/
+```
+
+## GET /status
+
+Estado del servidor en formato JSON.
+
+```text
+http://localhost:3000/status
+```
+
+---
+
+# Entidades
+
+## User
+
+Representa a los usuarios del sistema.
+
+Campos principales:
+
+```text
+id
+name
+email
+active
+created_at
+updated_at
+```
+
+---
+
+## Task
+
+Representa las tareas asociadas a los usuarios.
+
+Campos:
+
+```text
+id
+title
+description
+completed
+user_id
+created_at
+updated_at
+```
+
+---
+
+## Profile
+
+Representa información adicional de un usuario.
+
+Campos:
+
+```text
+id
+bio
+phone
+city
+user_id
+created_at
+updated_at
+```
+
+---
+
+## Role
+
+Representa los roles disponibles.
+
+Campos:
+
+```text
+id
+name
+description
+created_at
+updated_at
+```
+
+---
+
+## UserRole
+
+Tabla intermedia utilizada para la relación muchos a muchos entre usuarios y roles.
+
+Campos:
+
+```text
+user_id
+role_id
+created_at
+updated_at
+```
+
+---
+
+# Relaciones
+
+El proyecto implementa los tres tipos principales de relaciones solicitadas.
+
+## Relación 1:N
+
+```text
+User 1 ───── N Task
+```
+
+Un usuario puede tener muchas tareas.
+
+En Sequelize:
+
+```javascript
+User.hasMany(Task);
+Task.belongsTo(User);
+```
+
+---
+
+## Relación 1:1
+
+```text
+User 1 ───── 1 Profile
+```
+
+Cada usuario puede tener solamente un perfil.
+
+La columna:
+
+```text
+profiles.user_id
+```
+
+posee una restricción `UNIQUE`.
+
+---
+
+## Relación N:M
+
+```text
+User N ───── M Role
+```
+
+Se implementa mediante:
+
+```text
+user_roles
+```
+
+Ejemplo:
+
+```text
+Usuario 1
+├── Administrador
+└── Operador
+```
+
+---
+
+# CRUD de usuarios
+
+## Crear usuario
+
+```text
+POST /api/users
+```
 
 Ejemplo:
 
 ```json
 {
-  "status": "error",
-  "message": "Ruta no encontrada",
-  "data": null
+  "name": "Angelica Peña",
+  "email": "angelica@example.com",
+  "active": true
 }
 ```
 
 ---
 
-## Reflexión técnica
+## Listar usuarios
 
-Durante esta primera etapa se implementaron los fundamentos necesarios para construir una aplicación backend utilizando Node.js y Express.
-
-La separación entre rutas, controladores y middlewares permite comprender que cada componente posee una responsabilidad específica dentro de la aplicación.
-
-También se implementó persistencia básica utilizando el módulo nativo `fs` de Node.js, permitiendo registrar información sin utilizar todavía una base de datos.
-
-El uso de variables de entorno permite separar la configuración del código fuente y prepara el proyecto para almacenar de forma segura configuraciones relacionadas con PostgreSQL y autenticación.
-
-La estructura actual fue diseñada considerando las siguientes etapas del proyecto.
+```text
+GET /api/users
+```
 
 ---
 
-## Próximas etapas
+## Obtener usuario por ID
 
-### Módulo 7
+```text
+GET /api/users/:id
+```
 
-Se incorporará:
+Ejemplo:
 
-- PostgreSQL.
-- ORM.
-- Modelos.
-- Relaciones entre entidades.
-- Operaciones CRUD.
-- Consultas y filtros.
+```text
+GET /api/users/1
+```
 
-### Módulo 8
+---
 
-Se incorporará:
+## Actualizar usuario
 
-- API RESTful.
-- Autenticación.
-- JSON Web Tokens (JWT).
-- Rutas protegidas.
+```text
+PUT /api/users/:id
+```
+
+Ejemplo:
+
+```json
+{
+  "name": "Angelica Peña Sarniquet",
+  "active": false
+}
+```
+
+---
+
+## Eliminar usuario
+
+```text
+DELETE /api/users/:id
+```
+
+---
+
+# Búsquedas de usuarios
+
+Buscar por nombre o correo:
+
+```text
+GET /api/users?search=Angelica
+```
+
+Filtrar por estado:
+
+```text
+GET /api/users?active=false
+```
+
+Combinar filtros:
+
+```text
+GET /api/users?search=Angelica&active=false
+```
+
+---
+
+# CRUD de tareas
+
+## Crear tarea
+
+```text
+POST /api/tasks
+```
+
+Ejemplo:
+
+```json
+{
+  "title": "Revisar proyecto Node y Express",
+  "description": "Verificar CRUD y relaciones con Sequelize",
+  "completed": false,
+  "userId": 1
+}
+```
+
+---
+
+## Listar tareas
+
+```text
+GET /api/tasks
+```
+
+Las consultas incluyen automáticamente información del usuario relacionado.
+
+---
+
+## Obtener tarea por ID
+
+```text
+GET /api/tasks/:id
+```
+
+---
+
+## Actualizar tarea
+
+```text
+PUT /api/tasks/:id
+```
+
+Ejemplo:
+
+```json
+{
+  "completed": true
+}
+```
+
+---
+
+## Eliminar tarea
+
+```text
+DELETE /api/tasks/:id
+```
+
+---
+
+# Filtros de tareas
+
+Filtrar por estado:
+
+```text
+GET /api/tasks?completed=true
+```
+
+Filtrar por usuario:
+
+```text
+GET /api/tasks?userId=1
+```
+
+Buscar por título o descripción:
+
+```text
+GET /api/tasks?search=Node
+```
+
+Combinar filtros:
+
+```text
+GET /api/tasks?search=Node&userId=1&completed=true
+```
+
+---
+
+# Perfiles
+
+## Crear perfil
+
+```text
+POST /api/profiles
+```
+
+Ejemplo:
+
+```json
+{
+  "bio": "Perfil de usuario para proyecto Node y Express",
+  "phone": "+56912345678",
+  "city": "Santiago",
+  "userId": 1
+}
+```
+
+---
+
+## Obtener perfil de usuario
+
+```text
+GET /api/profiles/user/:userId
+```
+
+Ejemplo:
+
+```text
+GET /api/profiles/user/1
+```
+
+---
+
+## Actualizar perfil
+
+```text
+PUT /api/profiles/:id
+```
+
+---
+
+## Eliminar perfil
+
+```text
+DELETE /api/profiles/:id
+```
+
+---
+
+# Roles
+
+## Crear rol
+
+```text
+POST /api/roles
+```
+
+Ejemplo:
+
+```json
+{
+  "name": "Administrador",
+  "description": "Acceso administrativo al sistema"
+}
+```
+
+---
+
+## Listar roles
+
+```text
+GET /api/roles
+```
+
+---
+
+## Asignar rol a usuario
+
+```text
+POST /api/roles/assign
+```
+
+Ejemplo:
+
+```json
+{
+  "userId": 1,
+  "roleId": 1
+}
+```
+
+---
+
+## Obtener roles de usuario
+
+```text
+GET /api/roles/user/:userId
+```
+
+Ejemplo:
+
+```text
+GET /api/roles/user/1
+```
+
+---
+
+## Quitar rol a usuario
+
+```text
+DELETE /api/roles/:roleId/users/:userId
+```
+
+---
+
+# Validaciones implementadas
+
+El proyecto incluye, entre otras:
+
+- Nombre de usuario obligatorio.
+- Formato de correo válido.
+- Correo electrónico único.
+- Nombre de rol único.
+- Validación de usuario asociado.
+- Validación de relaciones duplicadas.
+- Un solo perfil por usuario.
+- Títulos de tareas obligatorios.
+- Manejo de registros inexistentes.
+
+---
+
+# Códigos HTTP utilizados
+
+```text
+200 OK
+201 Created
+400 Bad Request
+404 Not Found
+409 Conflict
+500 Internal Server Error
+```
+
+---
+
+# Persistencia básica del Módulo 6
+
+El middleware:
+
+```text
+middlewares/accessLogger.js
+```
+
+registra accesos en:
+
+```text
+logs/log.txt
+```
+
+Cada línea contiene:
+
+```text
+fecha | hora | método HTTP | ruta
+```
+
+---
+
+# Decisiones técnicas
+
+## app.js
+
+Se utiliza como punto de entrada de la aplicación.
+
+Sus responsabilidades son:
+
+- Cargar variables de entorno.
+- Inicializar Express.
+- Registrar modelos.
+- Configurar middlewares.
+- Servir archivos estáticos.
+- Conectar las rutas.
+- Comprobar PostgreSQL.
+- Sincronizar Sequelize.
+- Iniciar el servidor.
+
+---
+
+## Sequelize ORM
+
+Sequelize permite trabajar con PostgreSQL utilizando objetos y métodos JavaScript.
+
+Ejemplos:
+
+```javascript
+User.create()
+User.findAll()
+User.findByPk()
+user.update()
+user.destroy()
+```
+
+También facilita las relaciones mediante:
+
+```javascript
+hasOne()
+hasMany()
+belongsTo()
+belongsToMany()
+```
+
+---
+
+# Repositorio
+
+Código fuente:
+
+https://github.com/Anzu236/gestion-usuarios-node-express
+
+---
+
+# Próxima etapa - Módulo 8
+
+La siguiente etapa incorporará:
+
+- API RESTful ampliada.
+- Autenticación mediante JWT.
+- Login de usuarios.
+- Protección de rutas.
+- Manejo de tokens.
 - Subida de archivos.
-- Validación de archivos.
+- Validación de tipo y tamaño de archivos.
 
 ---
 
-## Autor
+# Autor
 
 **Angélica Peña Sarniquet**
 
