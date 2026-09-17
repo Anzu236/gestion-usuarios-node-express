@@ -3,49 +3,92 @@
 // ========================================
 
 
-// Cargar variables de entorno
+// ========================================
+// VARIABLES DE ENTORNO
+// ========================================
+
 require("dotenv").config();
 
 
-// Importar Express
-const express = require("express");
+// ========================================
+// IMPORTACIONES
+// ========================================
+
+const express =
+    require("express");
 
 
-// Importar el módulo path
-const path = require("path");
+const path =
+    require("path");
 
 
-// Importar las rutas principales
+const sequelize =
+    require("./config/database");
+
+
+// ========================================
+// IMPORTAR MODELOS Y RELACIONES
+// ========================================
+
+require("./models");
+
+
+// ========================================
+// IMPORTAR RUTAS
+// ========================================
+
 const indexRoutes =
     require("./routes/indexRoutes");
 
 
-// Crear aplicación Express
-const app = express();
+const userRoutes =
+    require("./routes/userRoutes");
 
 
-// Obtener puerto desde .env
+const taskRoutes =
+    require("./routes/taskRoutes");
+
+
+const profileRoutes =
+    require("./routes/profileRoutes");
+
+
+const roleRoutes =
+    require("./routes/roleRoutes");
+
+
+// ========================================
+// CREAR APLICACIÓN
+// ========================================
+
+const app =
+    express();
+
+
 const PORT =
     process.env.PORT || 3000;
 
 
 // ========================================
-// MIDDLEWARES GENERALES
+// MIDDLEWARES
 // ========================================
 
-
-// Permite recibir información JSON
 app.use(
+
     express.json()
+
 );
 
 
-// Permite recibir datos provenientes
-// de formularios HTML.
 app.use(
+
     express.urlencoded({
-        extended: true
+
+        extended:
+            true
+
     })
+
 );
 
 
@@ -53,52 +96,111 @@ app.use(
 // ARCHIVOS ESTÁTICOS
 // ========================================
 
-// Indicamos a Express que todo lo
-// almacenado dentro de /public
-// puede ser solicitado directamente
-// desde el navegador.
 app.use(
+
     express.static(
+
         path.join(
+
             __dirname,
+
             "public"
+
         )
+
     )
+
 );
 
 
 // ========================================
-// RUTAS
+// RUTAS PRINCIPALES
 // ========================================
 
-// Conectamos nuestras rutas externas
-// con la aplicación.
 app.use(
+
     "/",
+
     indexRoutes
+
 );
 
 
 // ========================================
-// RUTA NO ENCONTRADA
+// API USUARIOS
 // ========================================
 
-// Si ninguna ruta anterior coincide,
-// devolvemos error HTTP 404.
 app.use(
+
+    "/api/users",
+
+    userRoutes
+
+);
+
+
+// ========================================
+// API TAREAS
+// ========================================
+
+app.use(
+
+    "/api/tasks",
+
+    taskRoutes
+
+);
+
+
+// ========================================
+// API PERFILES
+// ========================================
+
+app.use(
+
+    "/api/profiles",
+
+    profileRoutes
+
+);
+
+
+// ========================================
+// API ROLES
+// ========================================
+
+app.use(
+
+    "/api/roles",
+
+    roleRoutes
+
+);
+
+
+// ========================================
+// RUTA 404
+// ========================================
+
+app.use(
+
     (req, res) => {
 
         res.status(404).json({
 
-            status: "error",
+            status:
+                "error",
 
-            message: "Ruta no encontrada",
+            message:
+                "Ruta no encontrada",
 
-            data: null
+            data:
+                null
 
         });
 
     }
+
 );
 
 
@@ -106,13 +208,75 @@ app.use(
 // INICIAR SERVIDOR
 // ========================================
 
-app.listen(
-    PORT,
-    () => {
+const startServer = async () => {
+
+    try {
+
+        // Comprobar conexión
+        await sequelize.authenticate();
+
 
         console.log(
-            `Servidor iniciado en http://localhost:${PORT}`
+
+            "Conexión a PostgreSQL establecida correctamente."
+
+        );
+
+
+        // Sincronizar modelos
+        await sequelize.sync();
+
+
+        console.log(
+
+            "Modelos sincronizados con PostgreSQL."
+
+        );
+
+
+        // Iniciar servidor
+        app.listen(
+
+            PORT,
+
+            () => {
+
+                console.log(
+
+                    `Servidor iniciado en http://localhost:${PORT}`
+
+                );
+
+            }
+
         );
 
     }
-);
+    catch (error) {
+
+        console.error(
+
+            "Error al iniciar la aplicación:"
+
+        );
+
+
+        console.error(
+
+            error.message
+
+        );
+
+
+        process.exit(1);
+
+    }
+
+};
+
+
+// ========================================
+// EJECUTAR APLICACIÓN
+// ========================================
+
+startServer();
