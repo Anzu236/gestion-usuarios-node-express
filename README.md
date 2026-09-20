@@ -1,49 +1,70 @@
-# Gestión de Usuarios - Node.js, Express, Sequelize & PostgreSQL
+# Gestión de Usuarios - Node.js, Express, Sequelize, PostgreSQL y JWT
 
-Proyecto backend desarrollado con Node.js y Express como parte de la evaluación progresiva de los módulos 6, 7 y 8.
+Proyecto backend desarrollado como parte de una evaluación progresiva correspondiente a los módulos 6, 7 y 8.
 
-El proyecto comenzó con la configuración de un servidor Express y posteriormente fue ampliado con PostgreSQL, Sequelize ORM, operaciones CRUD, validaciones, consultas dinámicas, relaciones entre entidades y transacciones.
+El proyecto comenzó con la creación de un servidor utilizando Node.js y Express, posteriormente incorporó PostgreSQL y Sequelize ORM, y finalmente fue ampliado con una API RESTful, autenticación mediante JWT y subida segura de archivos.
 
 ---
 
 # Estado del proyecto
 
-Actualmente se encuentran implementadas:
+El proyecto se encuentra dividido conceptualmente en tres etapas.
 
-- Parte 1 - Módulo 6:
-  - Node.js.
-  - Express.
-  - Rutas públicas.
-  - Contenido HTML y JSON.
-  - Archivos estáticos.
-  - Middleware.
-  - Logs mediante archivos planos.
-  - Variables de entorno.
-  - Estructura modular.
+## Parte 1 - Módulo 6
 
-- Parte 2 - Módulo 7:
-  - PostgreSQL.
-  - Sequelize ORM.
-  - Modelos.
-  - CRUD.
-  - Consultas dinámicas.
-  - Validaciones.
-  - Manejo de errores.
-  - Relaciones 1:1.
-  - Relaciones 1:N.
-  - Relaciones N:M.
-  - Transacciones.
-  - Rollback.
-  - Comparación SQL manual vs ORM.
+Implementación inicial utilizando:
 
-La Parte 3 - Módulo 8 será desarrollada posteriormente e incorporará:
+- Node.js.
+- Express.
+- Variables de entorno.
+- Rutas modulares.
+- Controladores.
+- Middlewares.
+- Archivos estáticos.
+- Persistencia básica mediante archivos planos.
+- Registro de accesos.
 
-- API RESTful final.
-- Autenticación JWT.
+---
+
+## Parte 2 - Módulo 7
+
+Integración de base de datos y ORM:
+
+- PostgreSQL.
+- Sequelize ORM.
+- Modelos.
+- CRUD.
+- Consultas dinámicas.
+- Filtros.
+- Validaciones.
+- Manejo de errores.
+- Relaciones 1:1.
+- Relaciones 1:N.
+- Relaciones N:M.
+- Transacciones.
+- COMMIT.
+- ROLLBACK.
+- Comparación entre SQL manual y ORM.
+
+---
+
+## Parte 3 - Módulo 8
+
+Implementación de API segura:
+
+- API RESTful.
+- Registro de usuarios.
+- Contraseñas cifradas con bcrypt.
 - Login.
+- JSON Web Tokens.
 - Rutas protegidas.
+- Validación de tokens.
+- Expiración de JWT.
 - Subida de archivos.
-- Validación de archivos.
+- Multer.
+- Validación de formato.
+- Validación de tamaño.
+- Archivos públicos mediante URL.
 
 ---
 
@@ -56,8 +77,11 @@ La Parte 3 - Módulo 8 será desarrollada posteriormente e incorporará:
 - Sequelize ORM
 - pg
 - pg-hstore
-- dotenv 17.4.2
-- nodemon 3.1.14
+- bcryptjs
+- jsonwebtoken
+- multer
+- dotenv
+- nodemon
 - HTML5
 - CSS3
 - Git
@@ -67,7 +91,7 @@ La Parte 3 - Módulo 8 será desarrollada posteriormente e incorporará:
 
 # Arquitectura
 
-El proyecto utiliza una arquitectura modular con separación de responsabilidades.
+La aplicación utiliza una estructura modular basada en separación de responsabilidades.
 
 ```text
 Cliente
@@ -77,6 +101,9 @@ Express
    |
    v
 Routes
+   |
+   v
+Middlewares
    |
    v
 Controllers
@@ -94,7 +121,22 @@ Sequelize ORM
 PostgreSQL
 ```
 
-La separación permite mantener el código organizado y facilita agregar nuevas funcionalidades en etapas posteriores.
+La autenticación agrega una capa adicional:
+
+```text
+Cliente
+   |
+   | Authorization: Bearer JWT
+   v
+authMiddleware
+   |
+   | token válido
+   v
+Ruta protegida
+   |
+   v
+Controller
+```
 
 ---
 
@@ -107,41 +149,48 @@ gestion-usuarios-node-express/
 │   └── database.js
 │
 ├── controllers/
+│   ├── authController.js
 │   ├── indexController.js
-│   ├── userController.js
-│   ├── taskController.js
 │   ├── profileController.js
-│   └── roleController.js
+│   ├── roleController.js
+│   ├── taskController.js
+│   ├── uploadController.js
+│   └── userController.js
 │
 ├── logs/
 │   └── log.txt
 │
 ├── middlewares/
-│   └── accessLogger.js
+│   ├── accessLogger.js
+│   ├── authMiddleware.js
+│   └── uploadMiddleware.js
 │
 ├── models/
-│   ├── User.js
-│   ├── Task.js
 │   ├── Profile.js
 │   ├── Role.js
+│   ├── Task.js
+│   ├── User.js
 │   ├── UserRole.js
 │   └── index.js
 │
 ├── public/
-│   └── styles.css
+│   ├── styles.css
+│   └── uploads/
+│       └── .gitkeep
 │
 ├── routes/
+│   ├── authRoutes.js
 │   ├── indexRoutes.js
-│   ├── userRoutes.js
-│   ├── taskRoutes.js
 │   ├── profileRoutes.js
-│   └── roleRoutes.js
+│   ├── roleRoutes.js
+│   ├── taskRoutes.js
+│   ├── uploadRoutes.js
+│   └── userRoutes.js
 │
 ├── services/
 │   ├── .gitkeep
 │   └── userTransactionService.js
 │
-├── .env
 ├── .env.example
 ├── .gitignore
 ├── app.js
@@ -152,11 +201,11 @@ gestion-usuarios-node-express/
 
 ---
 
-# Requisitos del sistema
+# Requisitos
 
 Para ejecutar el proyecto se necesita:
 
-- Node.js versión 18 o superior.
+- Node.js 18 o superior.
 - npm.
 - PostgreSQL.
 - Git.
@@ -186,13 +235,13 @@ psql --version
 
 # Instalación
 
-## 1. Clonar el repositorio
+## 1. Clonar repositorio
 
 ```bash
 git clone https://github.com/Anzu236/gestion-usuarios-node-express.git
 ```
 
-## 2. Entrar al proyecto
+## 2. Ingresar al proyecto
 
 ```bash
 cd gestion-usuarios-node-express
@@ -206,11 +255,9 @@ npm install
 
 ---
 
-# Configuración de PostgreSQL
+# PostgreSQL
 
-El proyecto utiliza PostgreSQL como sistema de gestión de base de datos relacional.
-
-Base utilizada:
+Base de datos utilizada:
 
 ```text
 gestion_usuarios_db
@@ -222,7 +269,7 @@ Usuario:
 gestion_app
 ```
 
-Ejemplo de creación desde PostgreSQL:
+Ejemplo de creación:
 
 ```sql
 CREATE ROLE gestion_app WITH LOGIN;
@@ -244,7 +291,13 @@ CREATE DATABASE gestion_usuarios_db OWNER gestion_app;
 
 # Variables de entorno
 
-El archivo `.env` contiene información sensible y no debe subirse a GitHub.
+Crear un archivo:
+
+```text
+.env
+```
+
+utilizando `.env.example` como referencia.
 
 Ejemplo:
 
@@ -256,78 +309,37 @@ DB_PORT=5432
 DB_NAME=gestion_usuarios_db
 DB_USER=gestion_app
 DB_PASSWORD=TU_CONTRASEÑA
+
+JWT_SECRET=TU_SECRETO_SEGURO
+JWT_EXPIRES_IN=1h
 ```
 
-El proyecto incluye:
+El archivo `.env` contiene información sensible y se encuentra excluido mediante `.gitignore`.
 
-```text
-.env.example
-```
-
-como referencia pública.
-
-`.env` se encuentra protegido mediante `.gitignore`.
-
----
-
-# Conexión con PostgreSQL
-
-La configuración se encuentra en:
-
-```text
-config/database.js
-```
-
-Sequelize obtiene los datos desde variables de entorno.
-
-Al iniciar correctamente el servidor se muestra:
-
-```text
-Conexión a PostgreSQL establecida correctamente.
-Modelos sincronizados con PostgreSQL.
-Servidor iniciado en http://localhost:3000
-```
-
-Se utilizó Sequelize porque facilita la integración de PostgreSQL con JavaScript y permite trabajar con modelos, validaciones, relaciones y transacciones sin escribir todas las consultas SQL manualmente.
+No debe publicarse en GitHub.
 
 ---
 
 # Ejecución
 
-## Modo normal
+Modo normal:
 
 ```bash
 npm start
 ```
 
-## Modo desarrollo
+Modo desarrollo:
 
 ```bash
 npm run dev
 ```
 
-Nodemon reinicia automáticamente el servidor cuando se detectan modificaciones.
-
----
-
-# Rutas generales
-
-## GET /
-
-Página principal en HTML.
+Si todo funciona correctamente:
 
 ```text
-http://localhost:3000/
-```
-
----
-
-## GET /status
-
-Devuelve información del servidor en JSON.
-
-```text
-http://localhost:3000/status
+Conexión a PostgreSQL establecida correctamente.
+Modelos sincronizados con PostgreSQL.
+Servidor iniciado en http://localhost:3000
 ```
 
 ---
@@ -336,24 +348,23 @@ http://localhost:3000/status
 
 ## User
 
-Representa los usuarios.
-
-Campos principales:
-
 ```text
 id
 name
 email
 active
+password_hash
 created_at
 updated_at
 ```
 
+`password_hash` almacena la contraseña cifrada mediante bcrypt.
+
+La contraseña original nunca se almacena directamente.
+
 ---
 
 ## Task
-
-Representa tareas asociadas a usuarios.
 
 ```text
 id
@@ -369,8 +380,6 @@ updated_at
 
 ## Profile
 
-Representa información adicional de un usuario.
-
 ```text
 id
 bio
@@ -385,8 +394,6 @@ updated_at
 
 ## Role
 
-Representa roles disponibles.
-
 ```text
 id
 name
@@ -399,7 +406,7 @@ updated_at
 
 ## UserRole
 
-Tabla intermedia utilizada por la relación muchos a muchos.
+Tabla intermedia:
 
 ```text
 user_id
@@ -410,11 +417,9 @@ updated_at
 
 ---
 
-# Relaciones entre modelos
+# Relaciones Sequelize
 
-Se implementaron distintos tipos de relaciones mediante Sequelize.
-
-## Relación 1:N
+## 1:N
 
 ```text
 User 1 ───── N Task
@@ -422,48 +427,46 @@ User 1 ───── N Task
 
 Un usuario puede tener múltiples tareas.
 
-```javascript
-User.hasMany(Task);
-Task.belongsTo(User);
-```
-
 ---
 
-## Relación 1:1
+## 1:1
 
 ```text
 User 1 ───── 1 Profile
 ```
 
-Un usuario puede tener solamente un perfil.
-
-La columna:
-
-```text
-profiles.user_id
-```
-
-posee una restricción `UNIQUE`.
+Cada usuario puede poseer solamente un perfil.
 
 ---
 
-## Relación N:M
+## N:M
 
 ```text
 User N ───── M Role
 ```
 
-La relación utiliza la tabla intermedia:
+Se implementa mediante:
 
 ```text
 user_roles
 ```
 
-Un usuario puede poseer múltiples roles y un rol puede pertenecer a múltiples usuarios.
+---
+
+# API RESTful
+
+La aplicación utiliza operaciones HTTP para representar acciones sobre los recursos.
+
+```text
+GET     → Obtener información
+POST    → Crear información
+PUT     → Actualizar información
+DELETE  → Eliminar información
+```
 
 ---
 
-# CRUD de usuarios
+# Usuarios
 
 ## Crear usuario
 
@@ -471,42 +474,28 @@ Un usuario puede poseer múltiples roles y un rol puede pertenecer a múltiples 
 POST /api/users
 ```
 
-Ejemplo:
-
-```json
-{
-  "name": "Carlos Soto",
-  "email": "carlos.soto@example.com",
-  "active": true
-}
-```
-
 ---
 
 ## Listar usuarios
+
+Ruta protegida:
 
 ```text
 GET /api/users
 ```
 
-Ejemplo:
+Requiere:
 
 ```text
-http://localhost:3000/api/users
+Authorization: Bearer TOKEN
 ```
 
 ---
 
-## Obtener usuario por ID
+## Obtener usuario
 
 ```text
 GET /api/users/:id
-```
-
-Ejemplo:
-
-```text
-GET /api/users/1
 ```
 
 ---
@@ -517,15 +506,6 @@ GET /api/users/1
 PUT /api/users/:id
 ```
 
-Ejemplo:
-
-```json
-{
-  "name": "Angelica Peña Sarniquet",
-  "active": false
-}
-```
-
 ---
 
 ## Eliminar usuario
@@ -534,72 +514,9 @@ Ejemplo:
 DELETE /api/users/:id
 ```
 
-Antes de eliminar se comprueba que el usuario exista.
-
 ---
 
-# Usuarios simulados
-
-Para comprobar las consultas se crearon más de tres registros de prueba.
-
-Ejemplo:
-
-```text
-Angelica Peña Sarniquet
-Usuario Transaccion
-Carlos Soto
-Maria Gonzalez
-```
-
-Los registros fueron comprobados directamente desde PostgreSQL y también mediante el endpoint:
-
-```text
-GET /api/users
-```
-
----
-
-# Consultas dinámicas de usuarios
-
-## Buscar por nombre o correo
-
-```text
-GET /api/users?search=Angelica
-```
-
----
-
-## Filtrar por estado
-
-```text
-GET /api/users?active=true
-```
-
-o:
-
-```text
-GET /api/users?active=false
-```
-
----
-
-## Combinar filtros
-
-```text
-GET /api/users?search=Angelica&active=false
-```
-
-Se utiliza:
-
-```javascript
-Op.iLike
-```
-
-para realizar búsquedas sin distinguir mayúsculas y minúsculas en PostgreSQL.
-
----
-
-# CRUD de tareas
+# Tareas
 
 ## Crear tarea
 
@@ -607,30 +524,25 @@ para realizar búsquedas sin distinguir mayúsculas y minúsculas en PostgreSQL.
 POST /api/tasks
 ```
 
-Ejemplo:
-
-```json
-{
-  "title": "Revisar proyecto Node y Express",
-  "description": "Verificar CRUD y relaciones con Sequelize",
-  "completed": false,
-  "userId": 1
-}
-```
-
 ---
 
 ## Listar tareas
+
+Ruta protegida:
 
 ```text
 GET /api/tasks
 ```
 
-La consulta utiliza `include` para devolver además los datos del usuario relacionado.
+Requiere:
+
+```text
+Authorization: Bearer TOKEN
+```
 
 ---
 
-## Obtener tarea por ID
+## Obtener tarea
 
 ```text
 GET /api/tasks/:id
@@ -644,14 +556,6 @@ GET /api/tasks/:id
 PUT /api/tasks/:id
 ```
 
-Ejemplo:
-
-```json
-{
-  "completed": true
-}
-```
-
 ---
 
 ## Eliminar tarea
@@ -662,33 +566,45 @@ DELETE /api/tasks/:id
 
 ---
 
-# Filtros de tareas
+# Consultas dinámicas
 
-## Por estado
+## Usuarios
+
+Buscar:
 
 ```text
-GET /api/tasks?completed=true
+GET /api/users?search=Angelica
+```
+
+Filtrar:
+
+```text
+GET /api/users?active=true
 ```
 
 ---
 
-## Por usuario
+## Tareas
 
-```text
-GET /api/tasks?userId=1
-```
-
----
-
-## Búsqueda por título o descripción
+Buscar:
 
 ```text
 GET /api/tasks?search=Node
 ```
 
----
+Filtrar:
 
-## Filtros combinados
+```text
+GET /api/tasks?completed=true
+```
+
+Por usuario:
+
+```text
+GET /api/tasks?userId=1
+```
+
+Filtros combinados:
 
 ```text
 GET /api/tasks?search=Node&userId=1&completed=true
@@ -698,42 +614,25 @@ GET /api/tasks?search=Node&userId=1&completed=true
 
 # Perfiles
 
-## Crear perfil
+Crear:
 
 ```text
 POST /api/profiles
 ```
 
-Ejemplo:
-
-```json
-{
-  "bio": "Perfil de usuario para proyecto Node y Express",
-  "phone": "+56912345678",
-  "city": "Santiago",
-  "userId": 1
-}
-```
-
----
-
-## Obtener perfil de usuario
+Obtener por usuario:
 
 ```text
 GET /api/profiles/user/:userId
 ```
 
----
-
-## Actualizar perfil
+Actualizar:
 
 ```text
 PUT /api/profiles/:id
 ```
 
----
-
-## Eliminar perfil
+Eliminar:
 
 ```text
 DELETE /api/profiles/:id
@@ -743,57 +642,31 @@ DELETE /api/profiles/:id
 
 # Roles
 
-## Crear rol
+Crear:
 
 ```text
 POST /api/roles
 ```
 
-Ejemplo:
-
-```json
-{
-  "name": "Administrador",
-  "description": "Acceso administrativo al sistema"
-}
-```
-
----
-
-## Listar roles
+Listar:
 
 ```text
 GET /api/roles
 ```
 
----
-
-## Asignar rol a usuario
+Asignar rol:
 
 ```text
 POST /api/roles/assign
 ```
 
-Ejemplo:
-
-```json
-{
-  "userId": 1,
-  "roleId": 1
-}
-```
-
----
-
-## Obtener roles de usuario
+Roles de usuario:
 
 ```text
 GET /api/roles/user/:userId
 ```
 
----
-
-## Eliminar rol de un usuario
+Eliminar rol de usuario:
 
 ```text
 DELETE /api/roles/:roleId/users/:userId
@@ -801,12 +674,358 @@ DELETE /api/roles/:roleId/users/:userId
 
 ---
 
+# Autenticación
+
+La autenticación utiliza:
+
+- bcryptjs.
+- JSON Web Tokens.
+
+---
+
+# Registro
+
+Endpoint:
+
+```text
+POST /api/auth/register
+```
+
+Ejemplo:
+
+```json
+{
+  "name": "Usuario JWT",
+  "email": "jwt@example.com",
+  "password": "ClaveSegura123!"
+}
+```
+
+La contraseña es procesada con:
+
+```javascript
+bcrypt.hash()
+```
+
+Antes de almacenarse.
+
+La API nunca devuelve `password_hash` en las respuestas normales.
+
+---
+
+# Login
+
+El endpoint solicitado para login es:
+
+```text
+POST /login
+```
+
+También se encuentra disponible:
+
+```text
+POST /api/auth/login
+```
+
+Ejemplo:
+
+```json
+{
+  "email": "jwt@example.com",
+  "password": "ClaveSegura123!"
+}
+```
+
+Si las credenciales son correctas:
+
+```json
+{
+  "status": "success",
+  "message": "Inicio de sesión correcto",
+  "data": {
+    "user": {
+      "id": 8,
+      "name": "Usuario JWT",
+      "email": "jwt@example.com"
+    },
+    "token": "JWT"
+  }
+}
+```
+
+---
+
+# JSON Web Token
+
+El token se genera mediante:
+
+```javascript
+jwt.sign()
+```
+
+Su duración se configura desde:
+
+```env
+JWT_EXPIRES_IN=1h
+```
+
+El secreto se almacena únicamente en:
+
+```env
+JWT_SECRET
+```
+
+---
+
+# Uso del JWT
+
+Las rutas protegidas requieren:
+
+```text
+Authorization: Bearer TOKEN
+```
+
+Ejemplo:
+
+```bash
+curl http://localhost:3000/api/users \
+-H "Authorization: Bearer TOKEN"
+```
+
+---
+
+# Validación JWT
+
+Se probaron los siguientes casos:
+
+## Sin token
+
+Resultado:
+
+```text
+401 Unauthorized
+```
+
+Respuesta:
+
+```json
+{
+  "status": "error",
+  "message": "Token de autenticación requerido",
+  "data": null
+}
+```
+
+---
+
+## Token inválido
+
+Resultado:
+
+```text
+401 Unauthorized
+```
+
+Respuesta:
+
+```json
+{
+  "status": "error",
+  "message": "Token inválido",
+  "data": null
+}
+```
+
+---
+
+## Token válido
+
+Permite acceder a la ruta protegida.
+
+---
+
+## Token expirado
+
+Resultado:
+
+```text
+401 Unauthorized
+```
+
+Respuesta:
+
+```json
+{
+  "status": "error",
+  "message": "El token ha expirado",
+  "data": null
+}
+```
+
+La expiración fue comprobada utilizando temporalmente un token de pocos segundos.
+
+La configuración normal del proyecto permanece en:
+
+```env
+JWT_EXPIRES_IN=1h
+```
+
+---
+
+# Rutas protegidas
+
+Actualmente se encuentran protegidas mediante JWT:
+
+```text
+GET /api/users
+GET /api/tasks
+POST /upload
+```
+
+El middleware utilizado es:
+
+```text
+middlewares/authMiddleware.js
+```
+
+---
+
+# Subida de archivos
+
+La aplicación utiliza Multer.
+
+Endpoint:
+
+```text
+POST /upload
+```
+
+La solicitud debe utilizar:
+
+```text
+multipart/form-data
+```
+
+El nombre del campo esperado es:
+
+```text
+file
+```
+
+También requiere JWT:
+
+```text
+Authorization: Bearer TOKEN
+```
+
+---
+
+# Formatos permitidos
+
+Se aceptan imágenes:
+
+```text
+JPG
+JPEG
+PNG
+WEBP
+```
+
+Se valida tanto:
+
+- MIME type.
+- Extensión.
+
+---
+
+# Tamaño máximo
+
+El tamaño máximo permitido es:
+
+```text
+2 MB
+```
+
+Si se supera:
+
+```json
+{
+  "status": "error",
+  "message": "El archivo supera el tamaño máximo permitido de 2 MB",
+  "data": null
+}
+```
+
+---
+
+# Archivo de tipo inválido
+
+Por ejemplo, intentar subir:
+
+```text
+README.md
+```
+
+produce:
+
+```json
+{
+  "status": "error",
+  "message": "Tipo de archivo no permitido. Solo se aceptan JPG, JPEG, PNG y WEBP",
+  "data": null
+}
+```
+
+---
+
+# Almacenamiento
+
+Los archivos se guardan en:
+
+```text
+public/uploads/
+```
+
+Se utiliza un nombre único generado con:
+
+```javascript
+crypto.randomUUID()
+```
+
+para evitar sobrescrituras.
+
+---
+
+# Acceso público al archivo
+
+Después de una subida correcta se devuelve una URL similar a:
+
+```text
+http://localhost:3000/uploads/archivo.png
+```
+
+Dicha URL puede abrirse directamente desde el navegador.
+
+---
+
+# Archivos subidos y Git
+
+Los archivos cargados por usuarios no se versionan.
+
+`.gitignore` contiene:
+
+```gitignore
+public/uploads/*
+!public/uploads/.gitkeep
+```
+
+Esto mantiene la carpeta dentro del repositorio pero evita subir archivos reales.
+
+---
+
 # Transacciones
 
-Se implementó una operación transaccional que realiza dos acciones consecutivas:
-
-1. Crear un usuario.
-2. Crear una tarea asociada a ese usuario.
+El proyecto mantiene la funcionalidad desarrollada en el Módulo 7.
 
 Endpoint:
 
@@ -814,94 +1033,31 @@ Endpoint:
 POST /api/users/transaction
 ```
 
-Ejemplo:
-
-```json
-{
-  "name": "Usuario Transaccion",
-  "email": "transaccion.ok@example.com",
-  "active": true,
-  "title": "Tarea inicial transaccional",
-  "description": "Creada dentro de una transaccion Sequelize"
-}
-```
-
-El servicio se encuentra en:
+Realiza:
 
 ```text
-services/userTransactionService.js
+Crear User
+    +
+Crear Task
+```
+
+Si ambas acciones funcionan:
+
+```text
+COMMIT
+```
+
+Si alguna falla:
+
+```text
+ROLLBACK
 ```
 
 ---
 
-## COMMIT
+# SQL manual vs Sequelize
 
-Si ambas operaciones se ejecutan correctamente:
-
-```javascript
-await transaction.commit();
-```
-
-Se guardan tanto el usuario como la tarea.
-
-Ejemplo comprobado:
-
-```text
-Usuario Transaccion
-+
-Tarea inicial transaccional
-```
-
----
-
-## ROLLBACK
-
-Para comprobar el rollback se utilizó una tarea con un título inválido:
-
-```json
-{
-  "name": "Usuario Rollback",
-  "email": "rollback@example.com",
-  "title": "x"
-}
-```
-
-La validación de `Task` impide títulos menores a tres caracteres.
-
-Al fallar la creación de la tarea se ejecuta:
-
-```javascript
-await transaction.rollback();
-```
-
-El usuario tampoco queda almacenado.
-
-La comprobación SQL:
-
-```sql
-SELECT
-    id,
-    name,
-    email
-FROM users
-WHERE email = 'rollback@example.com';
-```
-
-devuelve:
-
-```text
-(0 rows)
-```
-
-Esto demuestra que la transacción fue revertida correctamente.
-
----
-
-# SQL manual vs Sequelize ORM
-
-Se realizó una comparación entre una consulta SQL directa y su equivalente mediante Sequelize.
-
-## SQL manual
+Consulta SQL:
 
 ```sql
 SELECT
@@ -913,13 +1069,7 @@ FROM users
 ORDER BY id;
 ```
 
-Esta consulta se ejecuta directamente sobre PostgreSQL.
-
----
-
-## Sequelize ORM
-
-La misma información es obtenida mediante:
+Consulta Sequelize equivalente:
 
 ```javascript
 User.findAll({
@@ -929,100 +1079,24 @@ User.findAll({
 });
 ```
 
-y expuesta mediante:
+Ambas consultas devolvieron los mismos registros.
 
-```text
-GET /api/users
-```
+Sequelize facilita:
 
-Ambos métodos devolvieron los mismos registros.
-
----
-
-## Comparación
-
-### SQL manual
-
-Ventajas:
-
-- Control directo sobre la consulta.
-- Permite optimizar sentencias específicas.
-- Facilita comprender exactamente qué operación realiza la base de datos.
-
-Desventajas:
-
-- Requiere escribir SQL manualmente.
-- Puede aumentar la cantidad de código.
-- Las relaciones y validaciones requieren mayor gestión manual.
-
-### Sequelize ORM
-
-Ventajas:
-
-- Permite trabajar mediante objetos JavaScript.
-- Facilita CRUD.
-- Integra validaciones.
-- Simplifica relaciones.
-- Permite utilizar `include`.
-- Facilita transacciones.
-- Reduce SQL escrito manualmente.
-
-Desventajas:
-
-- Agrega una capa de abstracción.
-- Algunas consultas avanzadas pueden requerir conocimientos adicionales del ORM.
-
-Para este proyecto se utilizó Sequelize porque facilita la integración entre Express y PostgreSQL manteniendo una arquitectura modular y escalable.
-
----
-
-# Validaciones implementadas
-
-Entre las principales validaciones se encuentran:
-
-- Nombre de usuario obligatorio.
-- Longitud del nombre.
-- Correo electrónico obligatorio.
-- Formato válido de correo.
-- Correo electrónico único.
-- Título de tarea obligatorio.
-- Longitud mínima del título.
-- Usuario asociado existente.
-- Perfil único por usuario.
-- Rol único.
-- Relación usuario-rol no duplicada.
-- Validación de IDs inexistentes.
-
----
-
-# Manejo de errores
-
-La API utiliza respuestas estructuradas:
-
-```json
-{
-  "status": "error",
-  "message": "Descripción del error",
-  "data": null
-}
-```
-
-Se utilizan códigos HTTP como:
-
-```text
-200 OK
-201 Created
-400 Bad Request
-404 Not Found
-409 Conflict
-500 Internal Server Error
-```
+- CRUD.
+- Validaciones.
+- Relaciones.
+- Includes.
+- Transacciones.
+- Integración con JavaScript.
 
 ---
 
 # Formato de respuestas
 
-Las respuestas siguen una estructura consistente:
+Las respuestas mantienen una estructura uniforme.
+
+Éxito:
 
 ```json
 {
@@ -1032,150 +1106,104 @@ Las respuestas siguen una estructura consistente:
 }
 ```
 
-Esto permite que futuros clientes puedan interpretar fácilmente el resultado de cada solicitud.
+Error:
+
+```json
+{
+  "status": "error",
+  "message": "Descripción del error",
+  "data": null
+}
+```
 
 ---
 
-# Persistencia mediante archivos planos
-
-Desde el Módulo 6 se mantiene el middleware:
+# Códigos HTTP utilizados
 
 ```text
-middlewares/accessLogger.js
+200 OK
+201 Created
+400 Bad Request
+401 Unauthorized
+403 Forbidden
+404 Not Found
+409 Conflict
+500 Internal Server Error
 ```
-
-que registra accesos en:
-
-```text
-logs/log.txt
-```
-
-El formato utilizado es:
-
-```text
-fecha | hora | método HTTP | ruta
-```
-
-Esto demuestra que la evolución hacia PostgreSQL no eliminó las funcionalidades desarrolladas anteriormente.
 
 ---
 
-# Decisiones técnicas
+# Seguridad implementada
 
-## Uso de app.js
+El proyecto incorpora:
 
-Se utilizó:
-
-```text
-app.js
-```
-
-como archivo principal porque representa de manera clara el punto de entrada de la aplicación Express.
-
-Actualmente sus responsabilidades son:
-
-- Cargar variables de entorno.
-- Crear Express.
-- Registrar middlewares.
-- Servir archivos estáticos.
-- Registrar rutas.
-- Registrar modelos.
-- Conectar PostgreSQL.
-- Sincronizar Sequelize.
-- Iniciar el servidor.
+- Contraseñas con bcrypt.
+- Contraseñas nunca devueltas por la API.
+- JWT firmado.
+- JWT con expiración.
+- Middleware de autenticación.
+- Rutas privadas.
+- Validación de archivos.
+- Tamaño máximo de archivos.
+- Extensiones permitidas.
+- Credenciales mediante variables de entorno.
+- `.env` excluido de Git.
 
 ---
 
-## Uso de PostgreSQL
+# Evidencias realizadas
 
-Se eligió PostgreSQL porque:
+Durante el desarrollo se verificaron:
 
-- Es una base de datos relacional robusta.
-- Soporta relaciones.
-- Permite transacciones.
-- Posee restricciones de integridad.
-- Se integra correctamente con Sequelize.
-- Es ampliamente utilizada en aplicaciones backend.
-
----
-
-## Protección de credenciales
-
-Las credenciales se almacenan en:
-
-```text
-.env
-```
-
-y dicho archivo se encuentra excluido de Git mediante:
-
-```text
-.gitignore
-```
-
-El repositorio contiene únicamente:
-
-```text
-.env.example
-```
-
-como referencia de configuración.
-
----
-
-# Evidencias del Módulo 7
-
-Durante el desarrollo se comprobaron:
-
-- Conexión correcta a PostgreSQL.
-- Sincronización de modelos.
-- Creación de tablas.
+- Servidor funcionando.
+- PostgreSQL conectado.
 - Persistencia real.
-- Más de tres usuarios simulados.
-- CRUD de usuarios.
-- CRUD de tareas.
-- Consultas filtradas.
-- Búsquedas dinámicas.
-- Relación User 1:N Task.
-- Relación User 1:1 Profile.
-- Relación User N:M Role.
-- Tabla intermedia `user_roles`.
-- Comparación SQL manual vs ORM.
-- Transacción exitosa.
-- Rollback ante error.
-- Código versionado en GitHub.
+- CRUD.
+- Relaciones ORM.
+- Transacciones.
+- Rollback.
+- SQL vs ORM.
+- Registro.
+- Contraseña cifrada.
+- Login incorrecto.
+- Login correcto.
+- Generación JWT.
+- Ruta sin token.
+- Token inválido.
+- JWT válido.
+- Token expirado.
+- Dos rutas protegidas.
+- Upload protegido.
+- Imagen válida.
+- Acceso público a imagen.
+- Archivo con extensión inválida.
+- Archivo superior a 2 MB.
+- Git y GitHub.
+
+---
+
+# Evolución del proyecto
+
+```text
+PARTE 1 - MÓDULO 6
+Node + Express
+        ↓
+PARTE 2 - MÓDULO 7
+PostgreSQL + Sequelize
+        ↓
+PARTE 3 - MÓDULO 8
+REST + JWT + Upload
+```
+
+Cada módulo amplía el proyecto anterior sin eliminar las funcionalidades previamente implementadas.
 
 ---
 
 # Repositorio
 
-Código fuente:
-
 ```text
 https://github.com/Anzu236/gestion-usuarios-node-express
 ```
-
----
-
-# Próxima etapa - Módulo 8
-
-La siguiente etapa continuará sobre este mismo proyecto.
-
-Se incorporará:
-
-- Diseño RESTful final.
-- Login.
-- JSON Web Tokens.
-- Rutas privadas.
-- Middleware de autenticación.
-- Validación y expiración de tokens.
-- Subida de archivos.
-- Multer.
-- Validación de tipo y tamaño.
-- Carpeta de uploads.
-- Documentación final de la API.
-
-El desarrollo del Módulo 8 no reemplazará los módulos anteriores, sino que ampliará progresivamente el backend existente.
 
 ---
 
