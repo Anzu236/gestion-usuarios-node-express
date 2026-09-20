@@ -19,42 +19,87 @@ const userController =
 
 
 // ========================================
-// CRUD DE USUARIOS
+// CREAR USUARIO
+// POST /api/users
 // ========================================
 
-
-// Crear usuario
 router.post(
+
     "/",
+
     userController.createUser
+
 );
 
 
-// Obtener todos
+// ========================================
+// TRANSACCIÓN:
+// CREAR USUARIO + TAREA
+// POST /api/users/transaction
+// ========================================
+
+router.post(
+
+    "/transaction",
+
+    userController.createUserWithTask
+
+);
+
+
+// ========================================
+// OBTENER USUARIOS
+// GET /api/users
+// ========================================
+
 router.get(
+
     "/",
+
     userController.getUsers
+
 );
 
 
-// Obtener uno por ID
+// ========================================
+// OBTENER USUARIO POR ID
+// GET /api/users/:id
+// ========================================
+
 router.get(
+
     "/:id",
+
     userController.getUserById
+
 );
 
 
-// Actualizar usuario
+// ========================================
+// ACTUALIZAR USUARIO
+// PUT /api/users/:id
+// ========================================
+
 router.put(
+
     "/:id",
+
     userController.updateUser
+
 );
 
 
-// Eliminar usuario
+// ========================================
+// ELIMINAR USUARIO
+// DELETE /api/users/:id
+// ========================================
+
 router.delete(
+
     "/:id",
+
     userController.deleteUser
+
 );
 
 
