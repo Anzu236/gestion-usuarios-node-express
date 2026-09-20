@@ -27,7 +27,7 @@ const sequelize =
 
 
 // ========================================
-// IMPORTAR MODELOS Y RELACIONES
+// MODELOS Y RELACIONES
 // ========================================
 
 require("./models");
@@ -39,6 +39,10 @@ require("./models");
 
 const indexRoutes =
     require("./routes/indexRoutes");
+
+
+const authRoutes =
+    require("./routes/authRoutes");
 
 
 const userRoutes =
@@ -57,6 +61,10 @@ const roleRoutes =
     require("./routes/roleRoutes");
 
 
+const uploadRoutes =
+    require("./routes/uploadRoutes");
+
+
 // ========================================
 // CREAR APLICACIÓN
 // ========================================
@@ -70,25 +78,24 @@ const PORT =
 
 
 // ========================================
-// MIDDLEWARES
+// MIDDLEWARES GENERALES
 // ========================================
 
+
+// JSON
 app.use(
-
     express.json()
-
 );
 
 
+// Formularios
 app.use(
-
     express.urlencoded({
 
         extended:
             true
 
     })
-
 );
 
 
@@ -101,11 +108,8 @@ app.use(
     express.static(
 
         path.join(
-
             __dirname,
-
             "public"
-
         )
 
     )
@@ -114,7 +118,43 @@ app.use(
 
 
 // ========================================
-// RUTAS PRINCIPALES
+// AUTENTICACIÓN
+// ========================================
+
+
+// API principal
+//
+// POST /api/auth/register
+// POST /api/auth/login
+
+app.use(
+
+    "/api/auth",
+
+    authRoutes
+
+);
+
+
+// Alias solicitado por la consigna:
+//
+// POST /login
+//
+// También queda disponible:
+//
+// POST /register
+
+app.use(
+
+    "/",
+
+    authRoutes
+
+);
+
+
+// ========================================
+// RUTAS GENERALES
 // ========================================
 
 app.use(
@@ -127,7 +167,7 @@ app.use(
 
 
 // ========================================
-// API USUARIOS
+// USUARIOS
 // ========================================
 
 app.use(
@@ -140,7 +180,7 @@ app.use(
 
 
 // ========================================
-// API TAREAS
+// TAREAS
 // ========================================
 
 app.use(
@@ -153,7 +193,7 @@ app.use(
 
 
 // ========================================
-// API PERFILES
+// PERFILES
 // ========================================
 
 app.use(
@@ -166,7 +206,7 @@ app.use(
 
 
 // ========================================
-// API ROLES
+// ROLES
 // ========================================
 
 app.use(
@@ -179,25 +219,40 @@ app.use(
 
 
 // ========================================
-// RUTA 404
+// SUBIDA DE ARCHIVOS
+// ========================================
+
+app.use(
+
+    "/upload",
+
+    uploadRoutes
+
+);
+
+
+// ========================================
+// RUTA NO ENCONTRADA
 // ========================================
 
 app.use(
 
     (req, res) => {
 
-        res.status(404).json({
+        res
+            .status(404)
+            .json({
 
-            status:
-                "error",
+                status:
+                    "error",
 
-            message:
-                "Ruta no encontrada",
+                message:
+                    "Ruta no encontrada",
 
-            data:
-                null
+                data:
+                    null
 
-        });
+            });
 
     }
 
@@ -208,71 +263,71 @@ app.use(
 // INICIAR SERVIDOR
 // ========================================
 
-const startServer = async () => {
+const startServer =
+    async () => {
 
-    try {
+        try {
 
-        // Comprobar conexión
-        await sequelize.authenticate();
+            // ====================================
+            // CONEXIÓN POSTGRESQL
+            // ====================================
 
-
-        console.log(
-
-            "Conexión a PostgreSQL establecida correctamente."
-
-        );
+            await sequelize.authenticate();
 
 
-        // Sincronizar modelos
-        await sequelize.sync();
+            console.log(
+                "Conexión a PostgreSQL establecida correctamente."
+            );
 
 
-        console.log(
+            // ====================================
+            // SINCRONIZAR MODELOS
+            // ====================================
 
-            "Modelos sincronizados con PostgreSQL."
-
-        );
-
-
-        // Iniciar servidor
-        app.listen(
-
-            PORT,
-
-            () => {
-
-                console.log(
-
-                    `Servidor iniciado en http://localhost:${PORT}`
-
-                );
-
-            }
-
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-
-            "Error al iniciar la aplicación:"
-
-        );
+            await sequelize.sync();
 
 
-        console.error(
-
-            error.message
-
-        );
+            console.log(
+                "Modelos sincronizados con PostgreSQL."
+            );
 
 
-        process.exit(1);
+            // ====================================
+            // INICIAR EXPRESS
+            // ====================================
 
-    }
+            app.listen(
 
-};
+                PORT,
+
+                () => {
+
+                    console.log(
+                        `Servidor iniciado en http://localhost:${PORT}`
+                    );
+
+                }
+
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Error al iniciar la aplicación:"
+            );
+
+
+            console.error(
+                error.message
+            );
+
+
+            process.exit(1);
+
+        }
+
+    };
 
 
 // ========================================

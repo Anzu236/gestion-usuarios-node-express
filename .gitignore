@@ -6,3 +6,6 @@ node_modules/
 
 # Archivos del sistema
 .DS_Store
+# Archivos subidos por usuarios
+public/uploads/*
+!public/uploads/.gitkeep

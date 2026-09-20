@@ -18,10 +18,20 @@ const userController =
     require("../controllers/userController");
 
 
+// Importar middleware JWT
+const {
+    authenticateToken
+} =
+    require("../middlewares/authMiddleware");
+
+
 // ========================================
 // CREAR USUARIO
 // POST /api/users
 // ========================================
+//
+// Se mantiene disponible para las pruebas
+// desarrolladas en módulos anteriores.
 
 router.post(
 
@@ -33,10 +43,12 @@ router.post(
 
 
 // ========================================
-// TRANSACCIÓN:
-// CREAR USUARIO + TAREA
+// TRANSACCIÓN
 // POST /api/users/transaction
 // ========================================
+//
+// Crear usuario + tarea en una
+// transacción Sequelize.
 
 router.post(
 
@@ -50,11 +62,14 @@ router.post(
 // ========================================
 // OBTENER USUARIOS
 // GET /api/users
+// RUTA PROTEGIDA
 // ========================================
 
 router.get(
 
     "/",
+
+    authenticateToken,
 
     userController.getUsers
 

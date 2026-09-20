@@ -2,13 +2,14 @@
 // MODELO USER
 // ========================================
 
-// Importamos DataTypes desde Sequelize.
-// DataTypes permite definir el tipo de
-// cada columna de nuestra tabla.
-const { DataTypes } = require("sequelize");
+
+// Importar DataTypes
+const {
+    DataTypes
+} = require("sequelize");
 
 
-// Importamos la conexión a PostgreSQL.
+// Importar conexión con PostgreSQL
 const sequelize =
     require("../config/database");
 
@@ -18,7 +19,9 @@ const sequelize =
 // ========================================
 
 const User = sequelize.define(
+
     "User",
+
     {
 
         // ====================================
@@ -54,15 +57,20 @@ const User = sequelize.define(
             validate: {
 
                 notEmpty: {
+
                     msg:
                         "El nombre es obligatorio"
+
                 },
 
                 len: {
-                    args: [2, 100],
+
+                    args:
+                        [3, 100],
 
                     msg:
-                        "El nombre debe contener entre 2 y 100 caracteres"
+                        "El nombre debe contener entre 3 y 100 caracteres"
+
                 }
 
             }
@@ -71,7 +79,7 @@ const User = sequelize.define(
 
 
         // ====================================
-        // EMAIL
+        // CORREO ELECTRÓNICO
         // ====================================
 
         email: {
@@ -88,13 +96,17 @@ const User = sequelize.define(
             validate: {
 
                 notEmpty: {
+
                     msg:
                         "El correo electrónico es obligatorio"
+
                 },
 
                 isEmail: {
+
                     msg:
                         "Debe ingresar un correo electrónico válido"
+
                 }
 
             }
@@ -103,7 +115,7 @@ const User = sequelize.define(
 
 
         // ====================================
-        // ESTADO
+        // ESTADO DEL USUARIO
         // ====================================
 
         active: {
@@ -117,32 +129,85 @@ const User = sequelize.define(
             defaultValue:
                 true
 
+        },
+
+
+        // ====================================
+        // CONTRASEÑA CIFRADA
+        // ====================================
+
+        passwordHash: {
+
+            type:
+                DataTypes.STRING(255),
+
+            allowNull:
+                true,
+
+            field:
+                "password_hash"
+
         }
 
     },
 
     {
 
-        // Nombre físico de la tabla
-        // dentro de PostgreSQL.
         tableName:
             "users",
 
-
-        // Sequelize creará automáticamente:
-        //
-        // created_at
-        // updated_at
         timestamps:
             true,
 
-
-        // Convierte createdAt en created_at
-        // y updatedAt en updated_at.
         underscored:
-            true
+            true,
+
+
+        // ====================================
+        // SCOPE POR DEFECTO
+        // ====================================
+        //
+        // Evita que passwordHash aparezca
+        // normalmente en consultas y respuestas.
+
+        defaultScope: {
+
+            attributes: {
+
+                exclude: [
+                    "passwordHash"
+                ]
+
+            }
+
+        },
+
+
+        // ====================================
+        // SCOPE PARA LOGIN
+        // ====================================
+        //
+        // Se utilizará solamente cuando
+        // necesitemos verificar la contraseña.
+
+        scopes: {
+
+            withPassword: {
+
+                attributes: {
+
+                    include: [
+                        "passwordHash"
+                    ]
+
+                }
+
+            }
+
+        }
 
     }
+
 );
 
 

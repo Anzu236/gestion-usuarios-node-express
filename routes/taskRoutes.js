@@ -13,53 +13,88 @@ const router =
     express.Router();
 
 
-// Importar controlador de tareas
+// Importar controlador
 const taskController =
     require("../controllers/taskController");
 
 
-// ========================================
-// CRUD DE TAREAS
-// ========================================
+// Importar middleware JWT
+const {
+    authenticateToken
+} =
+    require("../middlewares/authMiddleware");
 
 
-// Crear tarea
+// ========================================
+// CREAR TAREA
 // POST /api/tasks
+// ========================================
+
 router.post(
+
     "/",
+
     taskController.createTask
+
 );
 
 
-// Obtener todas las tareas
+// ========================================
+// OBTENER TODAS LAS TAREAS
 // GET /api/tasks
+// RUTA PROTEGIDA
+// ========================================
+
 router.get(
+
     "/",
+
+    authenticateToken,
+
     taskController.getTasks
+
 );
 
 
-// Obtener una tarea por ID
+// ========================================
+// OBTENER TAREA POR ID
 // GET /api/tasks/:id
+// ========================================
+
 router.get(
+
     "/:id",
+
     taskController.getTaskById
+
 );
 
 
-// Actualizar tarea
+// ========================================
+// ACTUALIZAR TAREA
 // PUT /api/tasks/:id
+// ========================================
+
 router.put(
+
     "/:id",
+
     taskController.updateTask
+
 );
 
 
-// Eliminar tarea
+// ========================================
+// ELIMINAR TAREA
 // DELETE /api/tasks/:id
+// ========================================
+
 router.delete(
+
     "/:id",
+
     taskController.deleteTask
+
 );
 
 
